@@ -372,10 +372,10 @@ public class Point2DUtil {
 	// Implementation based on Michel Beaudouin-Lafon http://doi.acm.org/10.1145/502348.502371
 	//
 	static public void transformPointsBasedOnDisplacementOfOnePoint(
-		ArrayList<Point2D> points,
-		// these should, of course, be in the same coordinate system as the points to transform
-		Point2D P_old,
-		Point2D P_new
+			ArrayList<Point2D> points,
+			// these should, of course, be in the same coordinate system as the points to transform
+			Point2D P_old,
+			Point2D P_new
 	) {
 		Point2D centroid = computeCentroidOfPoints( points );
 		Vector2D v1 = Point2D.diff( P_old, centroid );
@@ -383,8 +383,8 @@ public class Point2DUtil {
 		float rotationAngle = Vector2D.computeSignedAngle( v1, v2 );
 		float lengthToPreserve = v1.length();
 		Point2D newCentroid = Point2D.sum(
-			P_new,
-			Vector2D.mult( v2.normalized(), - lengthToPreserve )
+				P_new,
+				Vector2D.mult( v2.normalized(), - lengthToPreserve )
 		);
 		Vector2D translation = Point2D.diff( newCentroid, centroid );
 		float cosine = (float)Math.cos( rotationAngle );
@@ -395,6 +395,31 @@ public class Point2DUtil {
 			float relativeY = p.y() - centroid.y();
 			p.get()[0] = (cosine*relativeX - sine*relativeY) + translation.x() + centroid.x();
 			p.get()[1] = (sine*relativeX + cosine*relativeY) + translation.y() + centroid.y();
+		}
+	}
+
+	static public void transformPointsBasedOnTranslation(
+			ArrayList<Point2D> points,
+			// these should, of course, be in the same coordinate system as the points to transform
+			Point2D P_old,
+			Point2D P_new
+	) {
+		Point2D centroid = computeCentroidOfPoints( points );
+		Vector2D v1 = Point2D.diff( P_old, centroid );
+		Vector2D v2 = Point2D.diff( P_new, centroid );
+		float rotationAngle = Vector2D.computeSignedAngle( v1, v2 );
+		float lengthToPreserve = v1.length();
+		Point2D newCentroid = Point2D.sum(
+				P_new,
+				Vector2D.mult( v2.normalized(), - lengthToPreserve )
+		);
+		Vector2D translation = Point2D.diff( newCentroid, centroid );
+
+		for ( Point2D p : points ) {
+			float relativeX = p.x();
+			float relativeY = p.y();
+			p.get()[0] = relativeX + translation.x();
+			p.get()[1] = relativeY + translation.y();
 		}
 	}
 

@@ -392,6 +392,15 @@ public class DrawingView extends View {
 								gw.convertPixelsToWorldSpaceUnits( cursor1.getCurrentPosition() )
 							);
 						}
+						else if ( cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_MOVE && indexOfShapeBeingManipulated>=0 ) {
+							MyCursor cursor0 = cursorContainer.getCursorByIndex( 0 );
+							Shape shape = shapeContainer.getShape( indexOfShapeBeingManipulated );
+
+							Point2DUtil.transformPointsBasedOnTranslation(
+									shape.getPoints(),
+									gw.convertPixelsToWorldSpaceUnits(cursor0.getPreviousPosition()),
+									gw.convertPixelsToWorldSpaceUnits(cursor0.getCurrentPosition()));
+						}
 						else if ( type == MotionEvent.ACTION_UP ) {
 							cursorContainer.removeCursorByIndex( cursorIndex );
 							if ( cursorContainer.getNumCursors() == 0 ) {
