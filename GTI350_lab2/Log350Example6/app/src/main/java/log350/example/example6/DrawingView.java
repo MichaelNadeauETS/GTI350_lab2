@@ -178,13 +178,15 @@ public class DrawingView extends View {
 	static final int MODE_CAMERA_MANIPULATION = 1; // the user is panning/zooming the camera
 	static final int MODE_SHAPE_MANIPULATION = 2; // the user is translating/rotating/scaling a shape
 	static final int MODE_LASSO = 3; // the user is drawing a lasso to select shapes
+	static final int MODE_ENCADRER = 5;
 	int currentMode = MODE_NEUTRAL;
 
 	// This is only used when currentMode==MODE_SHAPE_MANIPULATION, otherwise it is equal to -1
 	int indexOfShapeBeingManipulated = -1;
 
 	MyButton lassoButton = new MyButton( "Lasso", 10, 70, 140, 140 );
-	
+	MyButton encadrerButton = new MyButton( "Encadrer", 10, 210, 140, 140 );
+
 	OnTouchListener touchListener;
 	
 	public DrawingView(Context context) {
@@ -216,6 +218,13 @@ public class DrawingView extends View {
 		arrayList.add( new Point2D(950,600) );
 		arrayList.add( new Point2D(850,700) );
 		arrayList.add( new Point2D(650,700) );
+		shapeContainer.addShape( arrayList );
+		arrayList.clear();
+		arrayList.add( new Point2D(450,750) );
+		arrayList.add( new Point2D(750,700) );
+		arrayList.add( new Point2D(950,710) );
+		arrayList.add( new Point2D(850,730) );
+		arrayList.add( new Point2D(650,790) );
 		shapeContainer.addShape( arrayList );
 		arrayList.clear();
 	}
@@ -255,6 +264,7 @@ public class DrawingView extends View {
 		gw.setCoordinateSystemToPixels();
 
 		lassoButton.draw( gw, currentMode == MODE_LASSO );
+		encadrerButton.draw( gw, currentMode == MODE_ENCADRER );
 
 		if ( currentMode == MODE_LASSO ) {
 			MyCursor lassoCursor = cursorContainer.getCursorByType( MyCursor.TYPE_DRAGGING, 0 );
@@ -262,6 +272,8 @@ public class DrawingView extends View {
 				gw.setColor(1.0f,0.0f,0.0f,0.5f);
 				gw.fillPolygon( lassoCursor.getPositions() );
 			}
+		}else if ( currentMode == MODE_ENCADRER ) {
+			System.out.println("Bouton encadrer poussé.");
 		}
 
 		if ( cursorContainer.getNumCursors() > 0 ) {
@@ -270,7 +282,6 @@ public class DrawingView extends View {
 			gw.setColor( 1.0f, 1.0f, 1.0f );
 			gw.drawString( 50, 50, "[" + cursorContainer.getNumCursors() + " contacts]");
 		}
-
 	}
 	
 	/**
@@ -360,7 +371,20 @@ public class DrawingView extends View {
 							}
 						}
 						break;
-					case MODE_CAMERA_MANIPULATION :
+					case MODE_ENCADRER :
+						if ( cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_DOWN ) {
+							Point2D p_pixels = new Point2D(x,y);
+							Point2D p_world = gw.convertPixelsToWorldSpaceUnits( p_pixels );
+							indexOfShapeBeingManipulated = shapeContainer.indexOfShapeContainingGivenPoint( p_world );
+							System.out.println("Debug A");
+							if ( encadrerButton.contains(p_pixels) ) {
+								currentMode = MODE_ENCADRER;
+								System.out.println("Debug B");
+								cursor.setType( MyCursor.TYPE_BUTTON );
+							}
+						}
+						break;
+						case MODE_CAMERA_MANIPULATION :
 						if ( cursorContainer.getNumCursors() == 2 && type == MotionEvent.ACTION_MOVE ) {
 							MyCursor cursor0 = cursorContainer.getCursorByIndex( 0 );
 							MyCursor cursor1 = cursorContainer.getCursorByIndex( 1 );
@@ -378,7 +402,7 @@ public class DrawingView extends View {
 								currentMode = MODE_NEUTRAL;
 						}
 						break;
-					case MODE_SHAPE_MANIPULATION :
+						case MODE_SHAPE_MANIPULATION :
 						if ( cursorContainer.getNumCursors() == 2 && type == MotionEvent.ACTION_MOVE && indexOfShapeBeingManipulated>=0 ) {
 							MyCursor cursor0 = cursorContainer.getCursorByIndex( 0 );
 							MyCursor cursor1 = cursorContainer.getCursorByIndex( 1 );
@@ -409,7 +433,7 @@ public class DrawingView extends View {
 							}
 						}
 						break;
-					case MODE_LASSO :
+						case MODE_LASSO :
 						if ( type == MotionEvent.ACTION_DOWN ) {
 							if ( cursorContainer.getNumCursorsOfGivenType(MyCursor.TYPE_DRAGGING) == 1 )
 								// there's already a finger dragging out the lasso
