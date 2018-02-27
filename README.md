@@ -15,4 +15,5 @@ steps : file/projects structure/
 ## Build issues and fix
 - "Failed to finalize session : INSTALL_FAILED_INVALID_APK: Split lib_slice_5_apk was defined multiple times" 
 - Session 'app': Error Installing APKs
+
 Fix : Build/Clean project; Build/Make Module
