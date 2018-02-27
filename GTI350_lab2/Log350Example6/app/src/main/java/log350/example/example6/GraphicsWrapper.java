@@ -115,6 +115,15 @@ class GraphicsWrapper {
 		zoomIn( scaleFactor, M2.x(), M2.y() );
 	}
 
+	public void panBasedOnDisplacementOfOnePoint(
+			// these are assumed to be in pixel coordinates
+			Point2D A_new, Point2D B_new
+	) {
+		Vector2D translation = Point2D.diff( A_new, B_new );
+
+		pan( translation.x(), translation.y() );
+	}
+
 	public void frame(
 		AlignedRectangle2D rect,
 		boolean expand // true if caller wants a margin of whitespace added around the rect

@@ -404,22 +404,13 @@ public class Point2DUtil {
 			Point2D P_old,
 			Point2D P_new
 	) {
-		Point2D centroid = computeCentroidOfPoints( points );
-		Vector2D v1 = Point2D.diff( P_old, centroid );
-		Vector2D v2 = Point2D.diff( P_new, centroid );
-		float rotationAngle = Vector2D.computeSignedAngle( v1, v2 );
-		float lengthToPreserve = v1.length();
-		Point2D newCentroid = Point2D.sum(
-				P_new,
-				Vector2D.mult( v2.normalized(), - lengthToPreserve )
-		);
-		Vector2D translation = Point2D.diff( newCentroid, centroid );
+		Vector2D translation = Point2D.diff( P_old, P_new );
 
 		for ( Point2D p : points ) {
 			float relativeX = p.x();
 			float relativeY = p.y();
-			p.get()[0] = relativeX + translation.x();
-			p.get()[1] = relativeY + translation.y();
+			p.get()[0] = relativeX - translation.x();
+			p.get()[1] = relativeY - translation.y();
 		}
 	}
 
