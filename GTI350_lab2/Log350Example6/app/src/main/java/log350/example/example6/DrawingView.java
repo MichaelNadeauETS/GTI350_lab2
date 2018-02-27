@@ -178,12 +178,14 @@ public class DrawingView extends View {
 	static final int MODE_CAMERA_MANIPULATION = 1; // the user is panning/zooming the camera
 	static final int MODE_SHAPE_MANIPULATION = 2; // the user is translating/rotating/scaling a shape
 	static final int MODE_LASSO = 3; // the user is drawing a lasso to select shapes
+	static final int MODE_EFFACER = 4;
 	int currentMode = MODE_NEUTRAL;
 
 	// This is only used when currentMode==MODE_SHAPE_MANIPULATION, otherwise it is equal to -1
 	int indexOfShapeBeingManipulated = -1;
 
 	MyButton lassoButton = new MyButton( "Lasso", 10, 70, 140, 140 );
+	MyButton effacerButton = new MyButton("Effacer", 10, 220, 140, 140 );
 	
 	OnTouchListener touchListener;
 	
@@ -255,6 +257,7 @@ public class DrawingView extends View {
 		gw.setCoordinateSystemToPixels();
 
 		lassoButton.draw( gw, currentMode == MODE_LASSO );
+		effacerButton.draw(gw, currentMode == MODE_EFFACER);
 
 		if ( currentMode == MODE_LASSO ) {
 			MyCursor lassoCursor = cursorContainer.getCursorByType( MyCursor.TYPE_DRAGGING, 0 );
@@ -350,6 +353,10 @@ public class DrawingView extends View {
 								currentMode = MODE_LASSO;
 								cursor.setType( MyCursor.TYPE_BUTTON );
 							}
+							else if ( effacerButton.contains(p_pixels) ) {
+								currentMode = MODE_EFFACER;
+								cursor.setType( MyCursor.TYPE_BUTTON );
+							}
 							else if ( indexOfShapeBeingManipulated >= 0 ) {
 								currentMode = MODE_SHAPE_MANIPULATION;
 								cursor.setType( MyCursor.TYPE_DRAGGING );
@@ -434,8 +441,28 @@ public class DrawingView extends View {
 							}
 						}
 						break;
+					case MODE_EFFACER :
+					    if (cursorContainer.getNumCursors() >= 2) {
+                            MyCursor cursor1 = cursorContainer.getCursorByIndex( 1 );
+                            Point2D p_world = gw.convertPixelsToWorldSpaceUnits( cursor1.getCurrentPosition() );
+                            indexOfShapeBeingManipulated = shapeContainer.indexOfShapeContainingGivenPoint( p_world );
+
+                            if ( indexOfShapeBeingManipulated>=0) {
+                                Shape shape = shapeContainer.getShape( indexOfShapeBeingManipulated );
+                                shapeContainer.removeShape(shape);
+                                indexOfShapeBeingManipulated = -1;
+                                
+                            }
+                        }
+
+					    if ( type == MotionEvent.ACTION_UP ) {
+                            cursorContainer.removeCursorByIndex( cursorIndex );
+                            if ( cursorContainer.getNumCursors() == 0 ) {
+                                currentMode = MODE_NEUTRAL;
+						}
+						break;
 					}
-					
+                    }
 					v.invalidate();
 					
 					return true;
