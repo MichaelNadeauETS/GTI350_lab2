@@ -78,8 +78,8 @@
       <file leaf-file-name="DrawingView.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/log350/example/example6/DrawingView.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4589">
-              <caret line="403" column="56" lean-forward="false" selection-start-line="403" selection-start-column="42" selection-end-line="403" selection-end-column="56" />
+            <state relative-caret-position="317">
+              <caret line="401" column="0" lean-forward="true" selection-start-line="401" selection-start-column="0" selection-end-line="401" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -1842,8 +1842,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="130" />
-    <option name="y" value="38" />
+    <option name="x" value="153" />
+    <option name="y" value="53" />
     <option name="width" value="1625" />
     <option name="height" value="1387" />
   </component>
@@ -2119,7 +2119,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1519766030063" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1519766873870" />
       </method>
     </configuration>
     <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
@@ -2167,7 +2167,7 @@
       </Profilers>
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1519766030063" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1519766873870" />
       </method>
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -2350,7 +2350,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1519766030064" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1519766873871" />
       </method>
     </configuration>
     <list size="1">
@@ -2389,7 +2389,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="130" y="38" width="1625" height="1387" extended-state="0" />
+    <frame x="153" y="53" width="1625" height="1387" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -2626,8 +2626,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/log350/example/example6/DrawingView.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4589">
-          <caret line="403" column="56" lean-forward="false" selection-start-line="403" selection-start-column="42" selection-end-line="403" selection-end-column="56" />
+        <state relative-caret-position="317">
+          <caret line="401" column="0" lean-forward="true" selection-start-line="401" selection-start-column="0" selection-end-line="401" selection-end-column="0" />
           <folding />
         </state>
       </provider>
