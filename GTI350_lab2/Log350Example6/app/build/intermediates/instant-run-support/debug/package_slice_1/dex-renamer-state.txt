@@ -1,4 +1,0 @@
-#Tue Feb 27 14:37:00 EST 2018
-base.0=/Users/am56700/Documents/GTI350_lab2/GTI350_lab2/Log350Example6/app/build/intermediates/transforms/dexMerger/debug/2
-path.0=classes.dex
-renamed.0=classes.dex
