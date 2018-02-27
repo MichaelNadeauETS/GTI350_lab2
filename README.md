@@ -19,3 +19,7 @@ steps : file/projects structure/
 - Session 'app': Error Installing APKs
 
 Fix : Build/Clean project; Build/Make Module
+
+## SDK dir
+fichier local.properties doit être modifié pour chacun d'entre nous, exemple :
+sdk.dir=/Users/am56700/Library/Android/sdk
