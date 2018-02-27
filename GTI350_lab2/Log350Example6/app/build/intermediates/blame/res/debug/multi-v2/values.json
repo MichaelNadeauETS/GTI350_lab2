@@ -1,10 +1,17 @@
 {
     "logs": [
         {
+<<<<<<< HEAD
             "outputFile": "/Users/ap37450/AndroidStudioProjects/GTI350_lab2/GTI350_lab2/Log350Example6/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values/values.xml",
             "map": [
                 {
                     "source": "/Users/ap37450/AndroidStudioProjects/GTI350_lab2/GTI350_lab2/Log350Example6/app/src/main/res/values/strings.xml",
+=======
+            "outputFile": "/Users/ak79930/Desktop/dev/GTI350_lab2/GTI350_lab2/Log350Example6/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values/values.xml",
+            "map": [
+                {
+                    "source": "/Users/ak79930/Desktop/dev/GTI350_lab2/GTI350_lab2/Log350Example6/app/src/main/res/values/strings.xml",
+>>>>>>> 769602306d55c363da9115cd27701eda26d18e64
                     "from": {
                         "startLines": "4,3",
                         "startColumns": "4,4",

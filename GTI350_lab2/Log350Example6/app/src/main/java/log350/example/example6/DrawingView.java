@@ -379,6 +379,11 @@ public class DrawingView extends View {
 								cursor1.getCurrentPosition()
 							);
 						}
+						else if (cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_MOVE ) {
+							MyCursor cursor0 = cursorContainer.getCursorByIndex(0);
+
+							gw.panBasedOnDisplacementOfOnePoint(cursor0.getCurrentPosition(), cursor0.getPreviousPosition());
+						}
 						else if ( type == MotionEvent.ACTION_UP ) {
 							cursorContainer.removeCursorByIndex( cursorIndex );
 							if ( cursorContainer.getNumCursors() == 0 )
@@ -398,6 +403,31 @@ public class DrawingView extends View {
 								gw.convertPixelsToWorldSpaceUnits( cursor0.getCurrentPosition() ),
 								gw.convertPixelsToWorldSpaceUnits( cursor1.getCurrentPosition() )
 							);
+						}
+						else if ( cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_MOVE && indexOfShapeBeingManipulated>=0 ) {
+							MyCursor cursor0 = cursorContainer.getCursorByIndex( 0 );
+
+							boolean selectedShapeInSelectedShapes = false;
+							Shape shape = shapeContainer.getShape(indexOfShapeBeingManipulated);
+
+							for (Shape s : selectedShapes)
+								if (shape.equals(s))
+									selectedShapeInSelectedShapes = true;
+
+							if (selectedShapes.size() > 1 && selectedShapeInSelectedShapes) {
+								for ( Shape s : selectedShapes) {
+
+									Point2DUtil.transformPointsBasedOnTranslation(
+											s.getPoints(),
+											gw.convertPixelsToWorldSpaceUnits(cursor0.getPreviousPosition()),
+											gw.convertPixelsToWorldSpaceUnits(cursor0.getCurrentPosition()));
+								}
+							} else {
+								Point2DUtil.transformPointsBasedOnTranslation(
+										shape.getPoints(),
+										gw.convertPixelsToWorldSpaceUnits(cursor0.getPreviousPosition()),
+										gw.convertPixelsToWorldSpaceUnits(cursor0.getCurrentPosition()));
+							}
 						}
 						else if ( type == MotionEvent.ACTION_UP ) {
 							cursorContainer.removeCursorByIndex( cursorIndex );
