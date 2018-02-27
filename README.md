@@ -1,5 +1,7 @@
 # GTI350_lab2
 
+# Git strategy
+Always make a clean project before any commit and/or push
 
 # Setup guide
 
