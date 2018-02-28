@@ -179,13 +179,23 @@ public class DrawingView extends View {
 	static final int MODE_SHAPE_MANIPULATION = 2; // the user is translating/rotating/scaling a shape
 	static final int MODE_LASSO = 3; // the user is drawing a lasso to select shapes
 	static final int MODE_EFFACER = 4;
+	static final int MODE_CREER = 5;
+	static final int MODE_ENCADRER = 6;
 	int currentMode = MODE_NEUTRAL;
 
 	// This is only used when currentMode==MODE_SHAPE_MANIPULATION, otherwise it is equal to -1
 	int indexOfShapeBeingManipulated = -1;
 
-	MyButton lassoButton = new MyButton( "Lasso", 10, 70, 140, 140 );
-	MyButton effacerButton = new MyButton("Effacer", 10, 220, 140, 140 );
+    MyButton creerButton = new MyButton( "Creer", 10, 70, 140, 140 );
+    MyButton effacerButton = new MyButton("Effacer", 10, 220, 140, 140 );
+    MyButton lassoButton = new MyButton("Lasso", 10, 370, 140, 140 );
+    MyButton encadrerButton = new MyButton("Encadrer", 10, 520, 140, 140 );
+
+//    MyButton lassoButton = new MyButton( "Lasso", 10, 70, 140, 140 );
+//	MyButton effacerButton = new MyButton("Effacer", 10, 220, 140, 140 );
+//    MyButton encadrerButton = new MyButton("Encadrer", 10, 370, 140, 140 );
+//    MyButton creerButton = new MyButton("Creer", 10, 520, 140, 140 );
+
 	
 	OnTouchListener touchListener;
 	
@@ -256,8 +266,10 @@ public class DrawingView extends View {
 
 		gw.setCoordinateSystemToPixels();
 
+        creerButton.draw(gw, currentMode == MODE_CREER);
+        effacerButton.draw(gw, currentMode == MODE_EFFACER);
 		lassoButton.draw( gw, currentMode == MODE_LASSO );
-		effacerButton.draw(gw, currentMode == MODE_EFFACER);
+		encadrerButton.draw(gw, currentMode == MODE_ENCADRER);
 
 		if ( currentMode == MODE_LASSO ) {
 			MyCursor lassoCursor = cursorContainer.getCursorByType( MyCursor.TYPE_DRAGGING, 0 );
@@ -282,223 +294,302 @@ public class DrawingView extends View {
 	 */
 	private OnTouchListener getTouchListener(){
 		if ( touchListener == null ) {
-			touchListener = new OnTouchListener() {
-				
-				public boolean onTouch(View v, MotionEvent event) {
+            touchListener = new OnTouchListener() {
 
-					int type = MotionEvent.ACTION_MOVE;
-					switch ( event.getActionMasked() ) {
-					case MotionEvent.ACTION_DOWN :
-						type = MotionEvent.ACTION_DOWN;
-						break;
-					case MotionEvent.ACTION_MOVE :
-						type = MotionEvent.ACTION_MOVE;
-						break;
-					case MotionEvent.ACTION_UP :
-					case MotionEvent.ACTION_POINTER_UP :
-					case MotionEvent.ACTION_CANCEL :
-						type = MotionEvent.ACTION_UP;
-						break;
-					}
+                public boolean onTouch(View v, MotionEvent event) {
+
+                    int type = MotionEvent.ACTION_MOVE;
+                    switch (event.getActionMasked()) {
+                        case MotionEvent.ACTION_DOWN:
+                            type = MotionEvent.ACTION_DOWN;
+                            break;
+                        case MotionEvent.ACTION_MOVE:
+                            type = MotionEvent.ACTION_MOVE;
+                            break;
+                        case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_POINTER_UP:
+                        case MotionEvent.ACTION_CANCEL:
+                            type = MotionEvent.ACTION_UP;
+                            break;
+                    }
 
 
-					int id = event.getPointerId(event.getActionIndex());
-					float x = event.getX(event.getActionIndex());
-					float y = event.getY(event.getActionIndex());
-					// Find the cursor that corresponds to the event id, if such a cursor already exists.
-					// If no such cursor exists, the below index will be -1, and the reference to cursor will be null.
-					int cursorIndex = cursorContainer.findIndexOfCursorById( id );
-					MyCursor cursor = (cursorIndex==-1) ? null : cursorContainer.getCursorByIndex( cursorIndex );
+                    int id = event.getPointerId(event.getActionIndex());
+                    float x = event.getX(event.getActionIndex());
+                    float y = event.getY(event.getActionIndex());
+                    // Find the cursor that corresponds to the event id, if such a cursor already exists.
+                    // If no such cursor exists, the below index will be -1, and the reference to cursor will be null.
+                    int cursorIndex = cursorContainer.findIndexOfCursorById(id);
+                    MyCursor cursor = (cursorIndex == -1) ? null : cursorContainer.getCursorByIndex(cursorIndex);
 
-					if ( cursor == null ) {
-						// The event does not correspond to any existing cursor.
-						// In other words, this is a new finger touching the screen.
-						// The event is probably of type DOWN.
-						// A new cursor will need to be created for the event.
-						if ( type == MotionEvent.ACTION_UP ) {
-							// This should never happen, but if it does, just ignore the event.
-							return true;
-						}
-						type = MotionEvent.ACTION_DOWN;
-						// Cause a new cursor to be created to keep track of this event id in the future
-						cursorIndex = cursorContainer.updateCursorById( id, x, y );
-						cursor = cursorContainer.getCursorByIndex( cursorIndex );
+                    if (cursor == null) {
+                        // The event does not correspond to any existing cursor.
+                        // In other words, this is a new finger touching the screen.
+                        // The event is probably of type DOWN.
+                        // A new cursor will need to be created for the event.
+                        if (type == MotionEvent.ACTION_UP) {
+                            // This should never happen, but if it does, just ignore the event.
+                            return true;
+                        }
+                        type = MotionEvent.ACTION_DOWN;
+                        // Cause a new cursor to be created to keep track of this event id in the future
+                        cursorIndex = cursorContainer.updateCursorById(id, x, y);
+                        cursor = cursorContainer.getCursorByIndex(cursorIndex);
 
-						// we will set the type of the cursor later, by calling cursor.setType( MyCursor.TYPE_... );
-					}
-					else {
-						// The event corresponds to an already existing cursor
-						// (and the cursor was probably created during an earlier event of type TOUCH_EVENT_DOWN).
-						// The current event is probably of type MOVE or UP.
+                        // we will set the type of the cursor later, by calling cursor.setType( MyCursor.TYPE_... );
+                    } else {
+                        // The event corresponds to an already existing cursor
+                        // (and the cursor was probably created during an earlier event of type TOUCH_EVENT_DOWN).
+                        // The current event is probably of type MOVE or UP.
 
-						cursorContainer.updateCursorById( id, x, y );
-						
-						if ( type == MotionEvent.ACTION_MOVE ) {
-							// Other fingers may have also moved, and there new positions are available in the event passed to us.
-							// For safety, we update all cursors now with their latest positions.
-							for ( int i = 0; i < event.getPointerCount(); ++i ) {
-								int tmp_id = event.getPointerId(i);
-								cursorContainer.updateCursorById( tmp_id, event.getX(i), event.getY(i) );
-							}
-						}
-					}
-					
-					switch ( currentMode ) {
-					case MODE_NEUTRAL :
-						if ( cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_DOWN ) {
-							Point2D p_pixels = new Point2D(x,y);
-							Point2D p_world = gw.convertPixelsToWorldSpaceUnits( p_pixels );
-							indexOfShapeBeingManipulated = shapeContainer.indexOfShapeContainingGivenPoint( p_world );
-							if ( lassoButton.contains(p_pixels) ) {
-								currentMode = MODE_LASSO;
-								cursor.setType( MyCursor.TYPE_BUTTON );
-							}
-							else if ( effacerButton.contains(p_pixels) ) {
-								currentMode = MODE_EFFACER;
-								cursor.setType( MyCursor.TYPE_BUTTON );
-							}
-							else if ( indexOfShapeBeingManipulated >= 0 ) {
-								currentMode = MODE_SHAPE_MANIPULATION;
-								cursor.setType( MyCursor.TYPE_DRAGGING );
-							}
-							else {
-								currentMode = MODE_CAMERA_MANIPULATION;
-								cursor.setType( MyCursor.TYPE_DRAGGING );
-							}
-						}
-						break;
-					case MODE_CAMERA_MANIPULATION :
-						if ( cursorContainer.getNumCursors() == 2 && type == MotionEvent.ACTION_MOVE ) {
-							MyCursor cursor0 = cursorContainer.getCursorByIndex( 0 );
-							MyCursor cursor1 = cursorContainer.getCursorByIndex( 1 );
-							// MyCursor otherCursor = ( cursor == cursor0 ) ? cursor1 : cursor0;
-							gw.panAndZoomBasedOnDisplacementOfTwoPoints(
-								cursor0.getPreviousPosition(),
-								cursor1.getPreviousPosition(),
-								cursor0.getCurrentPosition(),
-								cursor1.getCurrentPosition()
-							);
-						}
-						else if (cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_MOVE ) {
-							MyCursor cursor0 = cursorContainer.getCursorByIndex(0);
+                        cursorContainer.updateCursorById(id, x, y);
 
-							gw.panBasedOnDisplacementOfOnePoint(cursor0.getCurrentPosition(), cursor0.getPreviousPosition());
-						}
-						else if ( type == MotionEvent.ACTION_UP ) {
-							cursorContainer.removeCursorByIndex( cursorIndex );
-							if ( cursorContainer.getNumCursors() == 0 )
-								currentMode = MODE_NEUTRAL;
-						}
-						break;
-					case MODE_SHAPE_MANIPULATION :
-						if ( cursorContainer.getNumCursors() == 2 && type == MotionEvent.ACTION_MOVE && indexOfShapeBeingManipulated>=0 ) {
-							MyCursor cursor0 = cursorContainer.getCursorByIndex( 0 );
-							MyCursor cursor1 = cursorContainer.getCursorByIndex( 1 );
-							Shape shape = shapeContainer.getShape( indexOfShapeBeingManipulated );
-
-							Point2DUtil.transformPointsBasedOnDisplacementOfTwoPoints(
-								shape.getPoints(),
-								gw.convertPixelsToWorldSpaceUnits( cursor0.getPreviousPosition() ),
-								gw.convertPixelsToWorldSpaceUnits( cursor1.getPreviousPosition() ),
-								gw.convertPixelsToWorldSpaceUnits( cursor0.getCurrentPosition() ),
-								gw.convertPixelsToWorldSpaceUnits( cursor1.getCurrentPosition() )
-							);
-						}
-						else if ( cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_MOVE && indexOfShapeBeingManipulated>=0 ) {
-							MyCursor cursor0 = cursorContainer.getCursorByIndex( 0 );
-
-							boolean selectedShapeInSelectedShapes = false;
-							Shape shape = shapeContainer.getShape(indexOfShapeBeingManipulated);
-
-							for (Shape s : selectedShapes)
-								if (shape.equals(s))
-									selectedShapeInSelectedShapes = true;
-
-							if (selectedShapes.size() > 1 && selectedShapeInSelectedShapes) {
-								for ( Shape s : selectedShapes) {
-
-									Point2DUtil.transformPointsBasedOnTranslation(
-											s.getPoints(),
-											gw.convertPixelsToWorldSpaceUnits(cursor0.getPreviousPosition()),
-											gw.convertPixelsToWorldSpaceUnits(cursor0.getCurrentPosition()));
-								}
-							} else {
-								Point2DUtil.transformPointsBasedOnTranslation(
-										shape.getPoints(),
-										gw.convertPixelsToWorldSpaceUnits(cursor0.getPreviousPosition()),
-										gw.convertPixelsToWorldSpaceUnits(cursor0.getCurrentPosition()));
-							}
-						}
-						else if ( type == MotionEvent.ACTION_UP ) {
-							cursorContainer.removeCursorByIndex( cursorIndex );
-							if ( cursorContainer.getNumCursors() == 0 ) {
-								currentMode = MODE_NEUTRAL;
-								indexOfShapeBeingManipulated = -1;
-							}
-						}
-						break;
-					case MODE_LASSO :
-						if ( type == MotionEvent.ACTION_DOWN ) {
-							if ( cursorContainer.getNumCursorsOfGivenType(MyCursor.TYPE_DRAGGING) == 1 )
-								// there's already a finger dragging out the lasso
-								cursor.setType(MyCursor.TYPE_IGNORE);
-							else
-								cursor.setType(MyCursor.TYPE_DRAGGING);
-						}
-						else if ( type == MotionEvent.ACTION_MOVE ) {
-							// no further updating necessary here
-						}
-						else if ( type == MotionEvent.ACTION_UP ) {
-							if ( cursor.getType() == MyCursor.TYPE_DRAGGING ) {
-								// complete a lasso selection
-								selectedShapes.clear();
-
-								// Need to transform the positions of the cursor from pixels to world space coordinates.
-								// We will store the world space coordinates in the following data structure.
-								ArrayList< Point2D > lassoPolygonPoints = new ArrayList< Point2D >();
-								for ( Point2D p : cursor.getPositions() )
-									lassoPolygonPoints.add( gw.convertPixelsToWorldSpaceUnits( p ) );
-
-								for ( Shape s : shapeContainer.shapes ) {
-									if ( s.isContainedInLassoPolygon( lassoPolygonPoints ) ) {
-										selectedShapes.add( s );
-									}
-								}
-							}
-							cursorContainer.removeCursorByIndex( cursorIndex );
-							if ( cursorContainer.getNumCursors() == 0 ) {
-								currentMode = MODE_NEUTRAL;
-							}
-						}
-						break;
-					case MODE_EFFACER :
-					    if (cursorContainer.getNumCursors() >= 2) {
-                            MyCursor cursor1 = cursorContainer.getCursorByIndex( 1 );
-                            Point2D p_world = gw.convertPixelsToWorldSpaceUnits( cursor1.getCurrentPosition() );
-                            indexOfShapeBeingManipulated = shapeContainer.indexOfShapeContainingGivenPoint( p_world );
-
-                            if ( indexOfShapeBeingManipulated>=0) {
-                                Shape shape = shapeContainer.getShape( indexOfShapeBeingManipulated );
-                                shapeContainer.removeShape(shape);
-                                indexOfShapeBeingManipulated = -1;
-                                
+                        if (type == MotionEvent.ACTION_MOVE) {
+                            // Other fingers may have also moved, and there new positions are available in the event passed to us.
+                            // For safety, we update all cursors now with their latest positions.
+                            for (int i = 0; i < event.getPointerCount(); ++i) {
+                                int tmp_id = event.getPointerId(i);
+                                cursorContainer.updateCursorById(tmp_id, event.getX(i), event.getY(i));
                             }
                         }
-
-					    if ( type == MotionEvent.ACTION_UP ) {
-                            cursorContainer.removeCursorByIndex( cursorIndex );
-                            if ( cursorContainer.getNumCursors() == 0 ) {
-                                currentMode = MODE_NEUTRAL;
-						}
-						break;
-					}
                     }
-					v.invalidate();
-					
-					return true;
-				}
-			};
-		}
+
+                    switch (currentMode) {
+                        case MODE_NEUTRAL:
+                            if (cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_DOWN) {
+                                Point2D p_pixels = new Point2D(x, y);
+                                Point2D p_world = gw.convertPixelsToWorldSpaceUnits(p_pixels);
+                                indexOfShapeBeingManipulated = shapeContainer.indexOfShapeContainingGivenPoint(p_world);
+                                if (lassoButton.contains(p_pixels)) {
+                                    currentMode = MODE_LASSO;
+                                    cursor.setType(MyCursor.TYPE_BUTTON);
+                                } else if (effacerButton.contains(p_pixels)) {
+                                    currentMode = MODE_EFFACER;
+                                    cursor.setType(MyCursor.TYPE_BUTTON);
+                                } else if (creerButton.contains(p_pixels)) {
+                                    currentMode = MODE_CREER;
+                                    cursor.setType(MyCursor.TYPE_BUTTON);
+                                } else if (encadrerButton.contains(p_pixels)) {
+                                    currentMode = MODE_ENCADRER;
+                                    cursor.setType(MyCursor.TYPE_BUTTON);
+                                } else if (indexOfShapeBeingManipulated >= 0) {
+                                    currentMode = MODE_SHAPE_MANIPULATION;
+                                    cursor.setType(MyCursor.TYPE_DRAGGING);
+                                } else {
+                                    currentMode = MODE_CAMERA_MANIPULATION;
+                                    cursor.setType(MyCursor.TYPE_DRAGGING);
+                                }
+                            }
+                            break;
+                        case MODE_CAMERA_MANIPULATION:
+                            if (cursorContainer.getNumCursors() == 2 && type == MotionEvent.ACTION_MOVE) {
+                                MyCursor cursor0 = cursorContainer.getCursorByIndex(0);
+                                MyCursor cursor1 = cursorContainer.getCursorByIndex(1);
+                                // MyCursor otherCursor = ( cursor == cursor0 ) ? cursor1 : cursor0;
+                                gw.panAndZoomBasedOnDisplacementOfTwoPoints(
+                                        cursor0.getPreviousPosition(),
+                                        cursor1.getPreviousPosition(),
+                                        cursor0.getCurrentPosition(),
+                                        cursor1.getCurrentPosition()
+                                );
+                            } else if (cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_MOVE) {
+                                MyCursor cursor0 = cursorContainer.getCursorByIndex(0);
+
+                                gw.panBasedOnDisplacementOfOnePoint(cursor0.getCurrentPosition(), cursor0.getPreviousPosition());
+                            } else if (type == MotionEvent.ACTION_UP) {
+                                cursorContainer.removeCursorByIndex(cursorIndex);
+                                if (cursorContainer.getNumCursors() == 0)
+                                    currentMode = MODE_NEUTRAL;
+                            }
+                            break;
+                        case MODE_SHAPE_MANIPULATION:
+                            if (cursorContainer.getNumCursors() == 2 && type == MotionEvent.ACTION_MOVE && indexOfShapeBeingManipulated >= 0) {
+                                MyCursor cursor0 = cursorContainer.getCursorByIndex(0);
+                                MyCursor cursor1 = cursorContainer.getCursorByIndex(1);
+                                Shape shape = shapeContainer.getShape(indexOfShapeBeingManipulated);
+
+                                Point2DUtil.transformPointsBasedOnDisplacementOfTwoPoints(
+                                        shape.getPoints(),
+                                        gw.convertPixelsToWorldSpaceUnits(cursor0.getPreviousPosition()),
+                                        gw.convertPixelsToWorldSpaceUnits(cursor1.getPreviousPosition()),
+                                        gw.convertPixelsToWorldSpaceUnits(cursor0.getCurrentPosition()),
+                                        gw.convertPixelsToWorldSpaceUnits(cursor1.getCurrentPosition())
+                                );
+                            } else if (cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_MOVE && indexOfShapeBeingManipulated >= 0) {
+                                MyCursor cursor0 = cursorContainer.getCursorByIndex(0);
+
+                                boolean selectedShapeInSelectedShapes = false;
+                                Shape shape = shapeContainer.getShape(indexOfShapeBeingManipulated);
+
+                                for (Shape s : selectedShapes)
+                                    if (shape.equals(s))
+                                        selectedShapeInSelectedShapes = true;
+
+                                if (selectedShapes.size() > 1 && selectedShapeInSelectedShapes) {
+                                    for (Shape s : selectedShapes) {
+
+                                        Point2DUtil.transformPointsBasedOnTranslation(
+                                                s.getPoints(),
+                                                gw.convertPixelsToWorldSpaceUnits(cursor0.getPreviousPosition()),
+                                                gw.convertPixelsToWorldSpaceUnits(cursor0.getCurrentPosition()));
+                                    }
+                                } else {
+                                    Point2DUtil.transformPointsBasedOnTranslation(
+                                            shape.getPoints(),
+                                            gw.convertPixelsToWorldSpaceUnits(cursor0.getPreviousPosition()),
+                                            gw.convertPixelsToWorldSpaceUnits(cursor0.getCurrentPosition()));
+                                }
+                            } else if (type == MotionEvent.ACTION_UP) {
+                                cursorContainer.removeCursorByIndex(cursorIndex);
+                                if (cursorContainer.getNumCursors() == 0) {
+                                    currentMode = MODE_NEUTRAL;
+                                    indexOfShapeBeingManipulated = -1;
+                                }
+                            }
+                            break;
+
+                        case MODE_CREER:
+                            if ((cursorContainer.getNumCursors() > 3) && (type == MotionEvent.ACTION_DOWN)) {
+
+                                ArrayList< Point2D > points = new ArrayList< Point2D >();
+                                int numCursors = cursorContainer.getNumCursors();
+
+                                for(int i=0; i<numCursors; i++){
+                                    //add points to array list
+                                    points.add(gw.convertPixelsToWorldSpaceUnits(cursorContainer
+                                            .getCursorByIndex(i).getCurrentPosition()));
+                                }
+
+                                //remove first elemetn
+                                points.remove(0);
+                               // if(points.size() >)
+                                points = Point2DUtil.computeConvexHull(points);
+                                points = Point2DUtil.computeExpandedPolygon( points, 0 );
+
+                         
+                                    shapeContainer.addShape(points);
+
+
+
+//
+//                                for(int i=1; i<numCursors; i++){ //get all the points on screen except first one (1st one = finger on button)
+//                                    //add points to array list
+//                                    cursorContainer.removeCursorByIndex();
+//                                }
+                                //fsafsafasf
+//                                cursorContainer.removeCursorByIndex(cursorIndex);
+//                                if (cursorContainer.getNumCursors() == 0) {
+//                                    currentMode = MODE_NEUTRAL;
+//                                }
+//                                //
+//                                if (indexOfShapeBeingManipulated >= 0) {
+//                                    Shape shape = shapeContainer.getShape(indexOfShapeBeingManipulated);
+//                                    shapeContainer.removeShape(shape);
+//                                    indexOfShapeBeingManipulated = -1;
+//
+//                                }
+
+
+                            }
+
+
+                            if (type == MotionEvent.ACTION_UP) {
+
+
+                                cursorContainer.removeCursorByIndex(cursorIndex);
+                                for(int i=0; i< cursorContainer.getNumCursors(); i++) {
+                                    cursorContainer.removeCursorByIndex(i);
+                                }
+                                if (cursorContainer.getNumCursors() == 0) {
+                                    currentMode = MODE_NEUTRAL;
+                                }
+                                break;
+                            }
+
+                        case MODE_ENCADRER:
+                            if (cursorContainer.getNumCursors() == 2 && type == MotionEvent.ACTION_MOVE) {
+                                MyCursor cursor0 = cursorContainer.getCursorByIndex(0);
+                                MyCursor cursor1 = cursorContainer.getCursorByIndex(1);
+                                // MyCursor otherCursor = ( cursor == cursor0 ) ? cursor1 : cursor0;
+                                gw.panAndZoomBasedOnDisplacementOfTwoPoints(
+                                        cursor0.getPreviousPosition(),
+                                        cursor1.getPreviousPosition(),
+                                        cursor0.getCurrentPosition(),
+                                        cursor1.getCurrentPosition()
+                                );
+                            } else if (cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_MOVE) {
+                                MyCursor cursor0 = cursorContainer.getCursorByIndex(0);
+
+                                gw.panBasedOnDisplacementOfOnePoint(cursor0.getCurrentPosition(), cursor0.getPreviousPosition());
+                            } else if (type == MotionEvent.ACTION_UP) {
+                                cursorContainer.removeCursorByIndex(cursorIndex);
+                                if (cursorContainer.getNumCursors() == 0)
+                                    currentMode = MODE_NEUTRAL;
+                            }
+                            break;
+
+                        case MODE_LASSO:
+                            if (type == MotionEvent.ACTION_DOWN) {
+                                if (cursorContainer.getNumCursorsOfGivenType(MyCursor.TYPE_DRAGGING) == 1)
+                                    // there's already a finger dragging out the lasso
+                                    cursor.setType(MyCursor.TYPE_IGNORE);
+                                else
+                                    cursor.setType(MyCursor.TYPE_DRAGGING);
+                            } else if (type == MotionEvent.ACTION_MOVE) {
+                                // no further updating necessary here
+                            } else if (type == MotionEvent.ACTION_UP) {
+                                if (cursor.getType() == MyCursor.TYPE_DRAGGING) {
+                                    // complete a lasso selection
+                                    selectedShapes.clear();
+
+                                    // Need to transform the positions of the cursor from pixels to world space coordinates.
+                                    // We will store the world space coordinates in the following data structure.
+                                    ArrayList<Point2D> lassoPolygonPoints = new ArrayList<Point2D>();
+                                    for (Point2D p : cursor.getPositions())
+                                        lassoPolygonPoints.add(gw.convertPixelsToWorldSpaceUnits(p));
+
+                                    for (Shape s : shapeContainer.shapes) {
+                                        if (s.isContainedInLassoPolygon(lassoPolygonPoints)) {
+                                            selectedShapes.add(s);
+                                        }
+                                    }
+                                }
+                                cursorContainer.removeCursorByIndex(cursorIndex);
+                                if (cursorContainer.getNumCursors() == 0) {
+                                    currentMode = MODE_NEUTRAL;
+                                }
+                            }
+                            break;
+                        case MODE_EFFACER:
+                            if (cursorContainer.getNumCursors() >= 2) {
+                                MyCursor cursor1 = cursorContainer.getCursorByIndex(1);
+
+                                Point2D p_world = gw.convertPixelsToWorldSpaceUnits(cursor1.getCurrentPosition());
+                                indexOfShapeBeingManipulated = shapeContainer.indexOfShapeContainingGivenPoint(p_world);
+
+                                if (indexOfShapeBeingManipulated >= 0) {
+                                    Shape shape = shapeContainer.getShape(indexOfShapeBeingManipulated);
+                                    shapeContainer.removeShape(shape);
+                                    indexOfShapeBeingManipulated = -1;
+
+                                }
+                            }
+
+
+                            if (type == MotionEvent.ACTION_UP) {
+                                cursorContainer.removeCursorByIndex(cursorIndex);
+                                if (cursorContainer.getNumCursors() == 0) {
+                                    currentMode = MODE_NEUTRAL;
+                                }
+                                break;
+                            }
+                    }
+                    v.invalidate();
+
+                    return true;
+                }
+            };
+        }
 		return touchListener;
 	}
 
