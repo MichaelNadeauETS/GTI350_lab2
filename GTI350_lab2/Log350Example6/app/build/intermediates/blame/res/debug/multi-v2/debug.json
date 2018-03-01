@@ -1,32 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/khoi/Desktop/GTI350_lab2/GTI350_lab2/Log350Example6/app/build/intermediates/res/merged/debug/values_values.arsc.flat",
+            "outputFile": "/Users/am56700/Documents/GTI350_lab2/GTI350_lab2/Log350Example6/app/build/intermediates/res/merged/debug/values_values.arsc.flat",
             "map": [
                 {
-                    "source": "/Users/khoi/Desktop/GTI350_lab2/GTI350_lab2/Log350Example6/app/src/main/res/values/strings.xml",
-                    "from": {
-                        "startLines": "4,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "131,59",
-                        "endColumns": "51,70",
-                        "endOffsets": "178,125"
-                    },
-                    "to": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,107",
-                        "endColumns": "51,70",
-                        "endOffsets": "102,173"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "/Users/ap37450/AndroidStudioProjects/GTI350_lab2/GTI350_lab2/Log350Example6/app/build/intermediates/res/merged/debug/values_values.arsc.flat",
-            "map": [
-                {
-                    "source": "/Users/ap37450/AndroidStudioProjects/GTI350_lab2/GTI350_lab2/Log350Example6/app/src/main/res/values/strings.xml",
+                    "source": "/Users/am56700/Documents/GTI350_lab2/GTI350_lab2/Log350Example6/app/src/main/res/values/strings.xml",
                     "from": {
                         "startLines": "4,3",
                         "startColumns": "4,4",
