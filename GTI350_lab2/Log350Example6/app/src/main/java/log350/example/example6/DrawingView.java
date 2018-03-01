@@ -2,6 +2,7 @@
 package log350.example.example6;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 //import java.util.List;
 
 import android.content.Context;
@@ -491,31 +492,41 @@ public class DrawingView extends View {
                             break;
 
                         case MODE_CREER:
-                            if ((cursorContainer.getNumCursors() > 3) && (type == MotionEvent.ACTION_DOWN)) {
-
-                                ArrayList<Point2D> points = new ArrayList<Point2D>();
+                            ArrayList<Point2D> points = new ArrayList<Point2D>();
+                            if (type == MotionEvent.ACTION_UP) {
                                 int numCursors = cursorContainer.getNumCursors();
-
                                 for (int i = 0; i < numCursors; i++) {
                                     //add points to array list
                                     points.add(gw.convertPixelsToWorldSpaceUnits(cursorContainer
                                             .getCursorByIndex(i).getCurrentPosition()));
                                 }
-
                                 //remove first element
                                 points.remove(0);
                                 // if(points.size() >)
                                 points = Point2DUtil.computeConvexHull(points);
                                 points = Point2DUtil.computeExpandedPolygon(points, 0);
 
-
                                 shapeContainer.addShape(points);
+
+                                cursorContainer.removeCursorByIndex(cursorIndex);
+
+                                for (int i = 0; i < cursorContainer.getNumCursors(); i++) {
+                                    cursorContainer.removeCursorByIndex(i);
+                                }
+
+                                if (cursorContainer.getNumCursors() == 0) {
+                                    currentMode = MODE_NEUTRAL;
+
+                                }
                             }
 
+                            break;
+                        case MODE_ENCADRER:
+                            if (cursorContainer.getNumCursors() >= 1) {
+                                gw.frame(shapeContainer.getBoundingRectangle(), true);
 
+                            }
                             if (type == MotionEvent.ACTION_UP) {
-
-
                                 cursorContainer.removeCursorByIndex(cursorIndex);
                                 for (int i = 0; i < cursorContainer.getNumCursors(); i++) {
                                     cursorContainer.removeCursorByIndex(i);
@@ -525,23 +536,6 @@ public class DrawingView extends View {
                                 }
 
                             }
-
-                            break;
-                        case MODE_ENCADRER:
-                            if (cursorContainer.getNumCursors() >= 1) {
-                            gw.frame(shapeContainer.getBoundingRectangle(), true);
-
-                        }
-                        if (type == MotionEvent.ACTION_UP) {
-                            cursorContainer.removeCursorByIndex(cursorIndex);
-                            for (int i = 0; i < cursorContainer.getNumCursors(); i++) {
-                                cursorContainer.removeCursorByIndex(i);
-                            }
-                            if (cursorContainer.getNumCursors() == 0) {
-                                currentMode = MODE_NEUTRAL;
-                            }
-
-                        }
                             break;
                         case MODE_LASSO:
                             if (type == MotionEvent.ACTION_DOWN) {
