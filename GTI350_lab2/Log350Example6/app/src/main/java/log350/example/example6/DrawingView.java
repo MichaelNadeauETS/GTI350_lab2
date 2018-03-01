@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 import android.view.View;
+import android.util.Log;
 
 
 // This class stores the current position of a finger,
@@ -184,6 +185,8 @@ public class DrawingView extends View {
     ShapeContainer shapeContainer = new ShapeContainer();
     ArrayList<Shape> selectedShapes = new ArrayList<Shape>();
     CursorContainer cursorContainer = new CursorContainer();
+
+    boolean isInSelection = false;
 
     static final int MODE_NEUTRAL = 0; // the default mode
     static final int MODE_CAMERA_MANIPULATION = 1; // the user is panning/zooming the camera
@@ -372,6 +375,27 @@ public class DrawingView extends View {
                                 Point2D p_pixels = new Point2D(x, y);
                                 Point2D p_world = gw.convertPixelsToWorldSpaceUnits(p_pixels);
                                 indexOfShapeBeingManipulated = shapeContainer.indexOfShapeContainingGivenPoint(p_world);
+
+                                isInSelection = false;
+                                if (selectedShapes.size() > 0) {
+                                    MyCursor cursor0 = cursorContainer.getCursorByIndex(0);
+
+
+                                    ArrayList<Point2D> points = new ArrayList<Point2D>();
+                                    AlignedRectangle2D rect = new AlignedRectangle2D();
+                                    for (Shape s : selectedShapes) {
+                                        for (Point2D p : s.getPoints()) {
+                                            points.add(p);
+                                            rect.bound(p);
+                                        }
+                                    }
+                                    points = Point2DUtil.computeConvexHull(points);
+                                    points = Point2DUtil.computeExpandedPolygon(points, rect.getDiagonal().length() / 30);
+
+                                    isInSelection = Point2DUtil.isPointInsidePolygon(points, gw.convertPixelsToWorldSpaceUnits(cursor0.getCurrentPosition()));
+                                }
+                                Log.d("isInSelection", Boolean.toString(isInSelection));
+
                                 if (lassoButton.contains(p_pixels)) {
                                     currentMode = MODE_LASSO;
                                     cursor.setType(MyCursor.TYPE_BUTTON);
@@ -384,7 +408,7 @@ public class DrawingView extends View {
                                 } else if (encadrerButton.contains(p_pixels)) {
                                     currentMode = MODE_ENCADRER;
                                     cursor.setType(MyCursor.TYPE_BUTTON);
-                                } else if (indexOfShapeBeingManipulated >= 0) {
+                                } else if (indexOfShapeBeingManipulated >= 0 || isInSelection) {
                                     currentMode = MODE_SHAPE_MANIPULATION;
                                     cursor.setType(MyCursor.TYPE_DRAGGING);
                                 } else {
@@ -427,25 +451,30 @@ public class DrawingView extends View {
                                         gw.convertPixelsToWorldSpaceUnits(cursor0.getCurrentPosition()),
                                         gw.convertPixelsToWorldSpaceUnits(cursor1.getCurrentPosition())
                                 );
-                            } else if (cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_MOVE && indexOfShapeBeingManipulated >= 0) {
+                            } else if (cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_MOVE && (indexOfShapeBeingManipulated >= 0 || isInSelection)) {
                                 MyCursor cursor0 = cursorContainer.getCursorByIndex(0);
 
                                 boolean selectedShapeInSelectedShapes = false;
-                                Shape shape = shapeContainer.getShape(indexOfShapeBeingManipulated);
+                                if (indexOfShapeBeingManipulated >= 0) {
+                                    Shape shape = shapeContainer.getShape(indexOfShapeBeingManipulated);
 
-                                for (Shape s : selectedShapes)
-                                    if (shape.equals(s))
-                                        selectedShapeInSelectedShapes = true;
+                                    for (Shape s : selectedShapes)
+                                        if (shape.equals(s))
+                                            selectedShapeInSelectedShapes = true;
+                                }
 
-                                if (selectedShapes.size() > 1 && selectedShapeInSelectedShapes) {
+                                if ((selectedShapes.size() > 1 && selectedShapeInSelectedShapes) || isInSelection) {
                                     for (Shape s : selectedShapes) {
-
+                                        // selected shapes motion
                                         Point2DUtil.transformPointsBasedOnTranslation(
                                                 s.getPoints(),
                                                 gw.convertPixelsToWorldSpaceUnits(cursor0.getPreviousPosition()),
                                                 gw.convertPixelsToWorldSpaceUnits(cursor0.getCurrentPosition()));
                                     }
+
                                 } else {
+                                    // single shape motion
+                                    Shape shape = shapeContainer.getShape(indexOfShapeBeingManipulated);
                                     Point2DUtil.transformPointsBasedOnTranslation(
                                             shape.getPoints(),
                                             gw.convertPixelsToWorldSpaceUnits(cursor0.getPreviousPosition()),
@@ -456,6 +485,7 @@ public class DrawingView extends View {
                                 if (cursorContainer.getNumCursors() == 0) {
                                     currentMode = MODE_NEUTRAL;
                                     indexOfShapeBeingManipulated = -1;
+                                    isInSelection = false;
                                 }
                             }
                             break;
